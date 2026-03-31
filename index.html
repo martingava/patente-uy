@@ -5,63 +5,78 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Calculadora Patente Uruguay 2026</title>
     <style>
-        body { font-family: sans-serif; background-color: #f4f4f9; color: #333; display: flex; justify-content: center; padding: 20px; }
-        .card { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); max-width: 450px; width: 100%; }
-        h2 { color: #0056b3; margin-top: 0; }
-        label { display: block; margin: 15px 0 5px; font-weight: bold; }
-        input, select { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; font-size: 16px; }
-        button { width: 100%; background: #0056b3; color: white; border: none; padding: 12px; margin-top: 20px; border-radius: 6px; cursor: pointer; font-size: 16px; font-weight: bold; }
-        button:hover { background: #004494; }
-        .result-box { margin-top: 20px; padding: 15px; border-left: 5px solid #0056b3; background: #eef6ff; display: none; }
-        .legal-notice { margin-top: 20px; padding: 15px; border-left: 5px solid #ff9800; background: #fff3e0; font-size: 0.85em; color: #555; }
-        .footer { margin-top: 15px; font-size: 0.8em; color: #666; text-align: center; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f0f2f5; color: #333; display: flex; justify-content: center; padding: 20px; }
+        .card { background: white; padding: 30px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); max-width: 500px; width: 100%; }
+        h2 { color: #1a73e8; margin-top: 0; text-align: center; }
+        label { display: block; margin: 15px 0 5px; font-weight: 600; font-size: 0.9em; }
+        input, select { width: 100%; padding: 12px; border: 1px solid #dadce0; border-radius: 8px; box-sizing: border-box; font-size: 16px; transition: border 0.3s; }
+        input:focus { border-color: #1a73e8; outline: none; }
+        button { width: 100%; background: #1a73e8; color: white; border: none; padding: 14px; margin-top: 25px; border-radius: 8px; cursor: pointer; font-size: 16px; font-weight: bold; }
+        button:hover { background: #1557b0; }
+        .result-box { margin-top: 25px; padding: 20px; border-radius: 10px; background: #f8f9fa; border-left: 6px solid #1a73e8; display: none; }
+        .result-line { display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 1.05em; }
+        .highlight { color: #2d7d32; font-weight: bold; font-size: 1.2em; }
+        .disclaimer { margin-top: 25px; padding-top: 15px; border-top: 1px solid #eee; font-size: 0.75em; color: #777; line-height: 1.5; text-align: justify; }
+        .note-text { color: #d93025; font-size: 0.85em; margin-top: 5px; font-style: italic; }
     </style>
 </head>
 <body>
 
 <div class="card">
-    <h2>Calculadora Patente 2026</h2>
-    <p>Estimación basada en valores SUCIVE Uruguay.</p>
-
-    <label>Categoría del Vehículo:</label>
-    <select id="categoria" onchange="toggleInputs()">
+    <h2>Patente Uruguay 2026</h2>
+    
+    <label>Categoría y Estado:</label>
+    <select id="categoria" onchange="actualizarInterfaz()">
         <option value="auto_0km">Auto / Camioneta 0km (5%)</option>
         <option value="auto_usado">Auto / Camioneta Usado 2012+ (4.5%)</option>
-        <option value="electrico_0km">Vehículo Eléctrico 0km (3%)</option>
+        <option value="electrico_0km">Eléctrico 0km (3%)</option>
+        <option value="electrico_usado">Eléctrico Usado (2.25%)</option>
         <option value="camion">Camión (1.3%)</option>
         <option value="moto_grande">Moto > 500cc (5% o 4.5%)</option>
     </select>
 
     <label id="labelPrecio">Precio de Lista en USD (con IVA):</label>
-    <input type="number" id="precioInput" placeholder="Ej: 22000">
+    <input type="number" id="precioInput" placeholder="Ej: 24500">
+    <div id="notaMoto" class="note-text" style="display:none;">*Para motos < 500cc el valor depende de cada Intendencia.</div>
 
-    <button onclick="calcularPatente()">Calcular Costo</button>
+    <button onclick="calcular()">Calcular Estimación</button>
 
     <div id="resultado" class="result-box">
-        <p><strong>Valor Imponible:</strong> <span id="valImponible"></span></p>
-        <p><strong>Patente Anual:</strong> <span id="patenteAnual"></span></p>
-        <p><strong>Cuota Bimestral (6 cuotas):</strong> <span id="cuota"></span></p>
-        <hr>
-        <p style="color: green;"><strong>Pago Contado Enero (-20%):</strong> <span id="contado"></span></p>
-        <p style="font-size: 0.9em;"><i>*Basado en TCC SUCIVE 2026: $41,826</i></p>
-        <p id="notaAdicional" style="font-style: italic; color: #ff9800; margin-top: 10px;"></p>
+        <div class="result-line"><span>Patente Anual:</span> <span id="patenteAnual" style="font-weight:bold;"></span></div>
+        <div class="result-line"><span>Cuota Bimestral (x6):</span> <span id="cuota"></span></div>
+        <hr style="border: 0; border-top: 1px solid #ddd; margin: 15px 0;">
+        <div class="result-line"><span>Pago Contado (-20%):</span> <span id="contado" class="highlight"></span></div>
+        <p style="font-size: 0.8em; color: #666; margin-top:10px;">Tipo de cambio SUCIVE: $41,826</p>
     </div>
 
-    <div class="legal-notice">
-        <strong>Aviso Legal:</strong> Los valores aquí presentados son estimaciones calculadas en base a las tasas oficiales del SUCIVE para 2026. El monto exacto puede variar según el aforo específico que el organismo asigne al vehículo. Esta calculadora es una herramienta informativa y no sustituye la consulta oficial en el portal de SUCIVE.
-    </div>
-
-    <div class="footer">
-        Desarrollado por Martin Gava - Proyecto Abierto
+    <div class="disclaimer">
+        <strong>IMPORTANTE:</strong> Los valores aquí presentados son estimaciones informativas basadas en las alícuotas del SUCIVE para 2026. 
+        El monto exacto se determina según el aforo (valor de mercado) oficial que el organismo asigne. 
+        Esta herramienta no sustituye la consulta oficial en el portal de SUCIVE y no tiene validez legal.
     </div>
 </div>
 
 <script>
-    const TCC = 41.826; // Tipo de cambio fijo SUCIVE 2026
+    const TCC_SUCIVE = 41.826;
 
-    function calcularPatente() {
-        const categoria = document.getElementById('categoria').value;
-        let precioUSD = parseFloat(document.getElementById('precioInput').value);
+    function actualizarInterfaz() {
+        const cat = document.getElementById('categoria').value;
+        const label = document.getElementById('labelPrecio');
+        const notaMoto = document.getElementById('notaMoto');
+        
+        // Ajustar labels para que el usuario sepa qué ingresar
+        if (cat.includes('usado')) {
+            label.innerText = "Valor de Mercado Estimado en USD:";
+        } else {
+            label.innerText = "Precio de Lista en USD (con IVA):";
+        }
+        
+        notaMoto.style.display = (cat === 'moto_grande') ? 'block' : 'none';
+    }
+
+    function calcular() {
+        const cat = document.getElementById('categoria').value;
+        const precioUSD = parseFloat(document.getElementById('precioInput').value);
         
         if (isNaN(precioUSD) || precioUSD <= 0) {
             alert("Por favor, ingresa un precio válido.");
@@ -69,53 +84,31 @@
         }
 
         let tasa = 0.05;
-        let aplicaDescuentoIVA = true;
-        let mensajeNota = "";
+        let es0km = true;
 
-        switch(categoria) {
-            case 'auto_0km': 
-                tasa = 0.05; 
-                break;
-            case 'auto_usado': 
-                tasa = 0.045; 
-                aplicaDescuentoIVA = false;
-                break; 
-            case 'electrico_0km': 
-                tasa = 0.03; 
-                break;
-            case 'camion': 
-                tasa = 0.013; 
-                aplicaDescuentoIVA = false; 
-                break;
-            case 'moto_grande': 
-                tasa = 0.05; 
-                mensajeNota = "Nota: Para motos < 500cc el valor depende de cada Intendencia.";
-                break;
+        switch(cat) {
+            case 'auto_0km': tasa = 0.05; es0km = true; break;
+            case 'auto_usado': tasa = 0.045; es0km = false; break;
+            case 'electrico_0km': tasa = 0.03; es0km = true; break;
+            case 'electrico_usado': tasa = 0.0225; es0km = false; break;
+            case 'camion': tasa = 0.013; es0km = false; break;
+            case 'moto_grande': tasa = 0.045; es0km = false; break;
         }
 
-        let valorBaseUSD = aplicaDescuentoIVA ? (precioUSD / 1.22) : precioUSD;
-        let valorBaseUYU = valorBaseUSD * TCC;
+        // Si es 0km, SUCIVE quita el IVA (22%) del precio de lista para hallar la base imponible
+        let valorBaseUSD = es0km ? (precioUSD / 1.22) : precioUSD;
+        let valorBaseUYU = valorBaseUSD * TCC_SUCIVE;
+        
         let anual = valorBaseUYU * tasa;
         
-        document.getElementById('valImponible').innerText = "$" + Math.round(valorBaseUYU).toLocaleString();
-        document.getElementById('patenteAnual').innerText = "$" + Math.round(anual).toLocaleString();
-        document.getElementById('cuota').innerText = "$" + Math.round(anual / 6).toLocaleString();
-        document.getElementById('contado').innerText = "$" + Math.round(anual * 0.8).toLocaleString();
-        
-        const notaDiv = document.getElementById('notaAdicional');
-        notaDiv.innerText = mensajeNota;
+        // Formateo de números
+        const fmt = (num) => "$" + Math.round(num).toLocaleString('es-UY');
+
+        document.getElementById('patenteAnual').innerText = fmt(anual);
+        document.getElementById('cuota').innerText = fmt(anual / 6);
+        document.getElementById('contado').innerText = fmt(anual * 0.8);
         
         document.getElementById('resultado').style.display = 'block';
-    }
-
-    function toggleInputs() {
-        const cat = document.getElementById('categoria').value;
-        const label = document.getElementById('labelPrecio');
-        if (cat.includes('usado')) {
-            label.innerText = "Valor de Mercado Estimado (USD):";
-        } else {
-            label.innerText = "Precio de Lista en USD (con IVA):";
-        }
     }
 </script>
 
